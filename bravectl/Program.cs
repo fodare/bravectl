@@ -3,10 +3,10 @@ namespace BraveCtl
 {
     internal class Program
     {
-        static void Main(string[] arguments)
+        static async Task Main(string[] arguments)
         {
             ConsoleInputService inputService = new(arguments);
-            inputService.Run();
+            await inputService.Run();
         }
     }
 }
