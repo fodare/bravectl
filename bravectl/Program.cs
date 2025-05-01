@@ -1,7 +1,4 @@
-﻿using System;
-using Bravectl.Service;
-using BraveCtl.Model;
-using Microsoft.Extensions.Configuration;
+﻿using Bravectl.Service;
 namespace BraveCtl
 {
     internal class Program
