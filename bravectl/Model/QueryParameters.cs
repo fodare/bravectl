@@ -3,7 +3,7 @@ namespace BraveCtl.Model
 {
     public class QueryParameters
     {
-        [StringLength(399, ErrorMessage = "Qurey string can not be longer than {1}.")]
+        [StringLength(400, MinimumLength = 1, ErrorMessage = "Qurey string can not be longer than {1}.")]
         public string? Q { get; set; }
         public string? Country { get; set; }
         public string? Search_language { get; set; }
