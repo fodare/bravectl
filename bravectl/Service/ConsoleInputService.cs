@@ -1,3 +1,4 @@
+using BraveCtl.Model;
 using Spectre.Console;
 namespace Bravectl.Service
 {
@@ -33,17 +34,15 @@ namespace Bravectl.Service
         {
             try
             {
-                if (_cliArguments.Length == 0)
+                if (_cliArguments.Length == 0 || _cliArguments.Contains("-h") || _cliArguments.Contains("--help"))
                 {
                     await PrintHelp();
                 }
                 else if (_cliArguments.Length > 0)
                 {
                     var parsedInput = await ParseCommandLineArguments();
-                    foreach (var input in parsedInput)
-                    {
-                        Console.WriteLine(input.ToString());
-                    }
+                    QueryParameters queryParameters = await ConstructQueryParameters(parsedInput);
+                    AnsiConsole.MarkupLine($" Q:{queryParameters.Q}, Country:{queryParameters.Country}, Language:{queryParameters.Search_language}, UI:{queryParameters.UI_Language}, Count:{queryParameters.Count}, Safe:{queryParameters.SafeSearch}, SpellCheck:{queryParameters.Spellcheck}, Filter:{queryParameters.ResultFilter}, Summary:{queryParameters.Summary}");
                 }
             }
             catch (ArgumentException)
@@ -52,7 +51,7 @@ namespace Bravectl.Service
             }
         }
 
-        public Task PrintHelp()
+        public static Task PrintHelp()
         {
             AnsiConsole.WriteLine("Description: A lightweight C# command-line tool that interacts with the Brave API to facilitate web searches from your CLI.\n");
 
@@ -66,7 +65,6 @@ namespace Bravectl.Service
             AnsiConsole.WriteLine("  --lang, -l          (Optional: E.g en) Search language preference.");
             AnsiConsole.WriteLine("  --interface, -i     (Optional: E.g en-US) User interface language perferred in response.");
             AnsiConsole.WriteLine("  --safe, -s          (Optional: E.g off) Filter search results for adult content. Possible options are off, moderate, strict.");
-            AnsiConsole.WriteLine("  --truncate,-t       (Optional: E.g true) Enables suumery generation for web search. ");
             return Task.CompletedTask;
         }
 
@@ -109,6 +107,36 @@ namespace Bravectl.Service
                 }
                 return parsedResult;
             });
+        }
+
+        public Task<QueryParameters> ConstructQueryParameters(Dictionary<string, string> parsedCmdArguments)
+        {
+            return Task.Run(() =>
+            {
+                return new QueryParameters()
+                {
+                    Q = GetParsedArgumentValue(parsedCmdArguments, "q", "query"),
+                    Country = GetParsedArgumentValue(parsedCmdArguments, "c", "country"),
+                    Search_language = GetParsedArgumentValue(parsedCmdArguments, "l", "lang"),
+                    UI_Language = GetParsedArgumentValue(parsedCmdArguments, "i", "interface"),
+                    SafeSearch = GetParsedArgumentValue(parsedCmdArguments, "s", "safe"),
+                    ResultFilter = GetParsedArgumentValue(parsedCmdArguments, "f", "filter")!.ToLower()
+                };
+            });
+        }
+
+        public static string? GetParsedArgumentValue(Dictionary<string, string> parsedArguments, string firstKey, string secondKey)
+        {
+            string value = "";
+            if (parsedArguments.ContainsKey(firstKey))
+            {
+                value = parsedArguments[firstKey];
+            }
+            else if (parsedArguments.ContainsKey(secondKey))
+            {
+                value = parsedArguments[secondKey];
+            }
+            return value;
         }
     }
 }
