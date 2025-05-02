@@ -8,11 +8,11 @@ namespace BraveCtl.Model
         public string? Country { get; set; }
         public string? Search_language { get; set; }
         public string? UI_Language { get; set; }
-        public int Count { get; set; }
+        public int Count { get; set; } = 20;
         public string? SafeSearch { get; set; }
         public string? Freshness { get; set; }
-        public bool Spellcheck { get; set; }
-        public ResultFilter ResultFilter { get; set; }
-        public bool Summary { get; set; }
+        public bool Spellcheck { get; set; } = true;
+        public string? ResultFilter { get; set; }
+        public bool Summary { get; set; } = true;
     }
 }
