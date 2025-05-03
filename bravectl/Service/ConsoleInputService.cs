@@ -118,7 +118,7 @@ namespace Bravectl.Service
             });
         }
 
-        public Task<QueryParameters> ConstructQueryParameters(Dictionary<string, string> parsedCmdArguments)
+        public static Task<QueryParameters> ConstructQueryParameters(Dictionary<string, string> parsedCmdArguments)
         {
             return Task.Run(() =>
             {
