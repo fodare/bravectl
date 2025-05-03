@@ -1,12 +1,17 @@
 using Bravectl.Service;
 using BraveCtl.Model;
 
-namespace Bravectl.Service;
-
-public class BraveAPIService : IBraveAPIService
+namespace Bravectl.Service
 {
-    public Task<BraveResponse> GetRequest(QueryParameters queryParameters)
+    public class BraveAPIService : IBraveAPIService
     {
-        throw new NotImplementedException();
+        public Task<BraveResponse> GetRequest(QueryParameters queryParameters)
+        {
+            return Task.Run(() =>
+            {
+                BraveResponse braveResponse = new();
+                return braveResponse;
+            });
+        }
     }
 }
