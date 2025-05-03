@@ -7,7 +7,11 @@ namespace Bravectl.Helper
         private static readonly string[] KnownSafeSearch = ["off", "moderate", "strict"];
         public override bool IsValid(object? value)
         {
-            if (value is string && !string.IsNullOrWhiteSpace((string?)value))
+            if (value is null || string.IsNullOrEmpty((string?)(value)))
+            {
+                return true;
+            }
+            else if (value is string && !string.IsNullOrWhiteSpace((string?)value))
             {
                 if (KnownSafeSearch.Contains(((string?)value)))
                 {
