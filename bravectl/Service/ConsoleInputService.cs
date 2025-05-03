@@ -66,8 +66,9 @@ namespace Bravectl.Service
 
             AnsiConsole.WriteLine("Usage: barvectl [search-options]\n");
 
+            AnsiConsole.WriteLine("  --help, -h          Print help information.\n");
+
             AnsiConsole.WriteLine("Search options:");
-            AnsiConsole.WriteLine("  --help, -h          Print help information.");
             AnsiConsole.WriteLine("  --filter, -f        Result filter. Possible options are discussions, faq, infobox, news, query, summarizer, videos, web, locations.");
             AnsiConsole.WriteLine("  --query, -q         Search query (Max query length 400).");
             AnsiConsole.WriteLine("  --country, -c       (Optional: E.g US) Search query country, where the results come from.");
