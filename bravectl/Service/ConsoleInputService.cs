@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations;
 using BraveCtl.Model;
 using Spectre.Console;
 namespace Bravectl.Service
@@ -24,6 +25,7 @@ namespace Bravectl.Service
             { "truncate","t"}
         };
         private readonly string[] _cliArguments;
+        private ICollection<System.ComponentModel.DataAnnotations.ValidationResult>? _validationResults = null;
 
         public ConsoleInputService(string[] cliArguments)
         {
@@ -42,7 +44,14 @@ namespace Bravectl.Service
                 {
                     var parsedInput = await ParseCommandLineArguments();
                     QueryParameters queryParameters = await ConstructQueryParameters(parsedInput);
-                    AnsiConsole.MarkupLine($" Q:{queryParameters.Q}, Country:{queryParameters.Country}, Language:{queryParameters.Search_language}, UI:{queryParameters.UI_Language}, Count:{queryParameters.Count}, Safe:{queryParameters.SafeSearch}, SpellCheck:{queryParameters.Spellcheck}, Filter:{queryParameters.ResultFilter}, Summary:{queryParameters.Summary}");
+                    if (IsQueryParameterValid(queryParameters, out _validationResults))
+                    {
+                        AnsiConsole.MarkupLine($" Q:{queryParameters.Q}, Country:{queryParameters.Country}, Language:{queryParameters.Search_language}, UI:{queryParameters.UI_Language}, Count:{queryParameters.Count}, Safe:{queryParameters.SafeSearch}, SpellCheck:{queryParameters.Spellcheck}, Filter:{queryParameters.ResultFilter}, Summary:{queryParameters.Summary}");
+                    }
+                    else
+                    {
+                        Console.WriteLine(string.Join("\n", _validationResults.Select(result => result.ErrorMessage)));
+                    }
                 }
             }
             catch (ArgumentException)
@@ -59,7 +68,7 @@ namespace Bravectl.Service
 
             AnsiConsole.WriteLine("Search options:");
             AnsiConsole.WriteLine("  --help, -h          Print help information.");
-            AnsiConsole.WriteLine("  --filter, -f        Result filter. Possible options are discussions, videos, locations, faq, new,summarizer, web.");
+            AnsiConsole.WriteLine("  --filter, -f        Result filter. Possible options are discussions, faq, infobox, news, query, summarizer, videos, web, locations.");
             AnsiConsole.WriteLine("  --query, -q         Search query (Max query length 400).");
             AnsiConsole.WriteLine("  --country, -c       (Optional: E.g US) Search query country, where the results come from.");
             AnsiConsole.WriteLine("  --lang, -l          (Optional: E.g en) Search language preference.");
@@ -109,7 +118,7 @@ namespace Bravectl.Service
             });
         }
 
-        public Task<QueryParameters> ConstructQueryParameters(Dictionary<string, string> parsedCmdArguments)
+        public static Task<QueryParameters> ConstructQueryParameters(Dictionary<string, string> parsedCmdArguments)
         {
             return Task.Run(() =>
             {
@@ -137,6 +146,12 @@ namespace Bravectl.Service
                 value = parsedArguments[secondKey];
             }
             return value;
+        }
+
+        public static bool IsQueryParameterValid(QueryParameters queryParameters, out ICollection<System.ComponentModel.DataAnnotations.ValidationResult> validationResults)
+        {
+            validationResults = new List<System.ComponentModel.DataAnnotations.ValidationResult>();
+            return Validator.TryValidateObject(queryParameters, new ValidationContext(queryParameters), validationResults, true);
         }
     }
 }
