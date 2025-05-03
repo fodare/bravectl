@@ -148,7 +148,7 @@ namespace Bravectl.Service
             return value;
         }
 
-        public bool IsQueryParameterValid(QueryParameters queryParameters, out ICollection<System.ComponentModel.DataAnnotations.ValidationResult> validationResults)
+        public static bool IsQueryParameterValid(QueryParameters queryParameters, out ICollection<System.ComponentModel.DataAnnotations.ValidationResult> validationResults)
         {
             validationResults = new List<System.ComponentModel.DataAnnotations.ValidationResult>();
             return Validator.TryValidateObject(queryParameters, new ValidationContext(queryParameters), validationResults, true);
