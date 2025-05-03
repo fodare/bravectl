@@ -17,6 +17,5 @@ namespace Bravectl.Helper
             }
             return false;
         }
-
     }
 }
