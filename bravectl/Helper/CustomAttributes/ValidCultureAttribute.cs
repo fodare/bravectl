@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using System.Globalization;
-namespace Bravectl.Helper
+namespace Bravectl.Helper.CustomAttributes
 {
     [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field, AllowMultiple = false)]
     public class ValidCultureAttribute : ValidationAttribute

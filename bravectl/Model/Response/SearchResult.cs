@@ -9,7 +9,6 @@ namespace Bravectl.Model.Response
         public bool Is_source_local { get; set; }
         public bool Is_source_both { get; set; }
         public string? Description { get; set; }
-
         public string? Page_age { get; set; }
         public SearchResultProfile? Profile { get; set; }
         public string? Language { get; set; }

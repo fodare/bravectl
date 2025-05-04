@@ -1,5 +1,5 @@
 using System.ComponentModel.DataAnnotations;
-namespace Bravectl.Helper
+namespace Bravectl.Helper.CustomAttributes
 {
     [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field, AllowMultiple = false)]
     public class ValidateSafeSearchAttribute : ValidationAttribute
