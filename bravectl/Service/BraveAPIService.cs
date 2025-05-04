@@ -6,12 +6,12 @@ namespace Bravectl.Service
     public class BraveAPIService : IBraveAPIService
     {
         private readonly HttpClient _httpClient;
-        private readonly string _braveAPIKey;
+        private readonly string? _braveAPIKey;
 
         public BraveAPIService()
         {
             _httpClient = new HttpClient();
-            _braveAPIKey = "";
+            _braveAPIKey = Environment.GetEnvironmentVariable("braveAPIKey");
         }
 
         public async Task<BraveResponse?> GetRequest(QueryParameters queryParameters)
