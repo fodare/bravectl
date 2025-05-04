@@ -1,4 +1,7 @@
 using System.ComponentModel.DataAnnotations;
+using System.Text.Json;
+using System.Web;
+using Bravectl.Model.Response;
 using BraveCtl.Model;
 using Spectre.Console;
 namespace Bravectl.Service
@@ -26,10 +29,12 @@ namespace Bravectl.Service
         };
         private readonly string[] _cliArguments;
         private ICollection<System.ComponentModel.DataAnnotations.ValidationResult>? _validationResults = null;
+        private readonly IBraveAPIService _braveAPIService;
 
         public ConsoleInputService(string[] cliArguments)
         {
             _cliArguments = cliArguments;
+            _braveAPIService = new BraveAPIService();
         }
 
         public async Task Run()
@@ -46,11 +51,11 @@ namespace Bravectl.Service
                     QueryParameters queryParameters = await ConstructQueryParameters(parsedInput);
                     if (IsQueryParameterValid(queryParameters, out _validationResults))
                     {
-                        AnsiConsole.MarkupLine($" Q:{queryParameters.Q}, Country:{queryParameters.Country}, Language:{queryParameters.Search_language}, UI:{queryParameters.UI_Language}, Count:{queryParameters.Count}, Safe:{queryParameters.SafeSearch}, SpellCheck:{queryParameters.Spellcheck}, Filter:{queryParameters.ResultFilter}, Summary:{queryParameters.Summary}");
+                        await PrintSearchResult(queryParameters);
                     }
                     else
                     {
-                        Console.WriteLine(string.Join("\n", _validationResults.Select(result => result.ErrorMessage)));
+                        AnsiConsole.MarkupLine($"[red]{string.Join("\n", _validationResults.Select(result => result.ErrorMessage))}[/]");
                     }
                 }
             }
@@ -153,6 +158,51 @@ namespace Bravectl.Service
         {
             validationResults = [];
             return Validator.TryValidateObject(queryParameters, new ValidationContext(queryParameters), validationResults, true);
+        }
+
+        public async Task PrintSearchResult(QueryParameters queryParameters)
+        {
+            try
+            {
+                BraveResponse? searchResult = await _braveAPIService.GetRequest(queryParameters);
+                await PrintResult(searchResult);
+            }
+            catch (JsonException exp)
+            {
+                AnsiConsole.MarkupLineInterpolated($"[red]Error parsing brave response.[/] Error message: {exp.Message}");
+            }
+            catch (HttpRequestException exp)
+            {
+                AnsiConsole.MarkupLineInterpolated($"[red]Barve API error.[/] Error message: {exp.Message}");
+            }
+        }
+
+        public static Task PrintResult(BraveResponse? braveResponse)
+        {
+            if (braveResponse!.Web != null)
+            {
+                var table = new Table()
+                {
+                    Title = new TableTitle("Search result"),
+                    ShowRowSeparators = true
+                };
+                table.AddColumns("[bold]Domain[/]", "[bold]Title[/]", "[bold]Short summary[/]", "[bold]URL[/]");
+                foreach (SearchResult searchResult in braveResponse.Web.Results!)
+                {
+                    table.AddRow(
+                        searchResult!.Profile!.Long_name!,
+                        EscapeHTMLtoString(searchResult!.Title!),
+                        EscapeHTMLtoString(searchResult!.Description!),
+                        searchResult!.Url!);
+                }
+                AnsiConsole.Write(table);
+            }
+            return Task.CompletedTask;
+        }
+
+        public static string EscapeHTMLtoString(string htmlString)
+        {
+            return HttpUtility.HtmlDecode(Markup.Escape(htmlString));
         }
     }
 }
