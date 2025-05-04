@@ -1,5 +1,5 @@
 using System.ComponentModel.DataAnnotations;
-using Bravectl.Helper;
+using Bravectl.Helper.CustomAttributes;
 namespace BraveCtl.Model
 {
     public class QueryParameters
@@ -13,7 +13,7 @@ namespace BraveCtl.Model
 
         [ValidCulture(ErrorMessage = "Provided culture / interface code is not valid. Example expected format de-DE.")]
         public string? UI_Language { get; set; } = "en-US";
-        public int Count { get; set; } = 20;
+        public int Count { get; set; } = 5;
 
         [ValidateSafeSearch(ErrorMessage = "Provided safe search input is not valid. Possible values are off, moderate, strict.")]
         public string? SafeSearch { get; set; } = "off";
