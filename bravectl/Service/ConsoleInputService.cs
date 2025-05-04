@@ -126,10 +126,10 @@ namespace Bravectl.Service
                 return new QueryParameters()
                 {
                     Q = GetParsedArgumentValue(parsedCmdArguments, "q", "query"),
-                    Country = GetParsedArgumentValue(parsedCmdArguments, "c", "country"),
-                    Search_language = GetParsedArgumentValue(parsedCmdArguments, "l", "lang"),
-                    UI_Language = GetParsedArgumentValue(parsedCmdArguments, "i", "interface"),
-                    SafeSearch = GetParsedArgumentValue(parsedCmdArguments, "s", "safe"),
+                    Country = string.IsNullOrWhiteSpace(GetParsedArgumentValue(parsedCmdArguments, "c", "country")) ? "US" : GetParsedArgumentValue(parsedCmdArguments, "c", "country"),
+                    Search_language = string.IsNullOrWhiteSpace(GetParsedArgumentValue(parsedCmdArguments, "l", "lang")) ? "en" : GetParsedArgumentValue(parsedCmdArguments, "l", "lang"),
+                    UI_Language = string.IsNullOrWhiteSpace(GetParsedArgumentValue(parsedCmdArguments, "i", "interface")) ? "en-US" : GetParsedArgumentValue(parsedCmdArguments, "i", "interface"),
+                    SafeSearch = string.IsNullOrWhiteSpace(GetParsedArgumentValue(parsedCmdArguments, "s", "safe")) ? "off" : GetParsedArgumentValue(parsedCmdArguments, "s", "safe"),
                     ResultFilter = GetParsedArgumentValue(parsedCmdArguments, "f", "filter")!.ToLower()
                 };
             });
