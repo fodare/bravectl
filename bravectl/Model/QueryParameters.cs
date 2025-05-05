@@ -13,6 +13,8 @@ namespace BraveCtl.Model
 
         [ValidCulture(ErrorMessage = "Provided culture / interface code is not valid. Example expected format de-DE.")]
         public string? UI_Language { get; set; } = "en-US";
+
+        [Range(1, 20, ErrorMessage = "Serch result count ranges between {1} - {2}.")]
         public int Count { get; set; } = 5;
 
         [ValidateSafeSearch(ErrorMessage = "Provided safe search input is not valid. Possible values are off, moderate, strict.")]

@@ -17,7 +17,7 @@ namespace Bravectl.Service
             { "l", "lang" },
             { "i", "interface" },
             { "s", "safe" },
-            { "t", "truncate"},
+            { "m", "max"},
             { "help", "h" },
             { "filter", "f" },
             { "query", "q" },
@@ -25,7 +25,7 @@ namespace Bravectl.Service
             { "lang", "l" },
             { "interface", "i" },
             { "safe", "s" },
-            { "truncate","t"}
+            { "max", "m"}
         };
         private readonly string[] _cliArguments;
         private ICollection<System.ComponentModel.DataAnnotations.ValidationResult>? _validationResults = null;
@@ -80,6 +80,7 @@ namespace Bravectl.Service
             AnsiConsole.WriteLine("  --lang, -l          (Optional: E.g en) Search language preference.");
             AnsiConsole.WriteLine("  --interface, -i     (Optional: E.g en-US) User interface language perferred in response.");
             AnsiConsole.WriteLine("  --safe, -s          (Optional: E.g off) Filter search results for adult content. Possible options are off, moderate, strict.");
+            AnsiConsole.WriteLine("  --max, -m           (Optional: E.g 10) Number of returned result. Default count is 5 and max is 20");
             return Task.CompletedTask;
         }
 
@@ -131,11 +132,18 @@ namespace Bravectl.Service
                 return new QueryParameters()
                 {
                     Q = GetParsedArgumentValue(parsedCmdArguments, "q", "query"),
+
                     Country = string.IsNullOrWhiteSpace(GetParsedArgumentValue(parsedCmdArguments, "c", "country")) ? "US" : GetParsedArgumentValue(parsedCmdArguments, "c", "country")!.ToUpper(),
+
                     Search_language = string.IsNullOrWhiteSpace(GetParsedArgumentValue(parsedCmdArguments, "l", "lang")) ? "en" : GetParsedArgumentValue(parsedCmdArguments, "l", "lang")!.ToLower(),
+
                     UI_Language = string.IsNullOrWhiteSpace(GetParsedArgumentValue(parsedCmdArguments, "i", "interface")) ? "en-US" : GetParsedArgumentValue(parsedCmdArguments, "i", "interface"),
+
                     SafeSearch = string.IsNullOrWhiteSpace(GetParsedArgumentValue(parsedCmdArguments, "s", "safe")) ? "off" : GetParsedArgumentValue(parsedCmdArguments, "s", "safe"),
-                    ResultFilter = GetParsedArgumentValue(parsedCmdArguments, "f", "filter")!.ToLower()
+
+                    ResultFilter = GetParsedArgumentValue(parsedCmdArguments, "f", "filter")!.ToLower(),
+
+                    Count = int.TryParse(GetParsedArgumentValue(parsedCmdArguments, "m", "max")!, out int max) ? max : 5
                 };
             });
         }
