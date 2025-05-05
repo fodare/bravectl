@@ -56,3 +56,9 @@ nunit-*.xml
 # Local config files
 local.txt
 .vscode
+
+# Ignore local tool package config
+*.config
+
+# Ignore packaged nugget files
+*nupkg
