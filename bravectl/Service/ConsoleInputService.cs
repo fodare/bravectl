@@ -45,7 +45,7 @@ namespace Bravectl.Service
                 {
                     await PrintHelp();
                 }
-                else if (_cliArguments.Length > 0)
+                else
                 {
                     var parsedInput = await ParseCommandLineArguments();
                     QueryParameters queryParameters = await ConstructQueryParameters(parsedInput);
