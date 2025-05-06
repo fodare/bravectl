@@ -22,7 +22,7 @@ namespace BraveCtl.Model
         public string? Freshness { get; set; }
         public bool Spellcheck { get; set; } = true;
 
-        [ValidateResultFilter(ErrorMessage = "Provided filter input is not valid. Possible values are discussions, faq, infobox, news, query, summarizer, videos, web, locations.")]
+        [ValidateResultFilter(ErrorMessage = "Provided filter input is not valid. Possible values are  videos, web.")]
         public string? ResultFilter { get; set; } = "web";
         public bool Summary { get; set; } = true;
     }
