@@ -9,5 +9,8 @@ namespace Bravectl.Model.Response
         public string? Description { get; set; }
         public string? Age { get; set; }
         public string? Page_age { get; set; }
+        public Video? Video { get; set; }
+        public MetaUrl? Meta_Url { get; set; }
+        public Thumbnail? Thumbnail { get; set; }
     }
 }

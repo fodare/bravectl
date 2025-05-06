@@ -3,6 +3,6 @@ namespace Bravectl.Service
 {
     public interface IBraveAPIService
     {
-        Task<BraveResponse?> GetRequest(QueryParameters queryParameters);
+        Task<BraveResponse?> Search(QueryParameters queryParameters);
     }
 }
