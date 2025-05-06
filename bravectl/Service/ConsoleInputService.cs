@@ -51,7 +51,8 @@ namespace Bravectl.Service
                     QueryParameters queryParameters = await ConstructQueryParameters(parsedInput);
                     if (IsQueryParameterValid(queryParameters, out _validationResults))
                     {
-                        await PrintSearchResult(queryParameters);
+                        BraveResponse braveResponse = await GetSearchResult(queryParameters);
+                        await PrintSearchResult(braveResponse, queryParameters.ResultFilter!);
                     }
                     else
                     {
@@ -74,7 +75,7 @@ namespace Bravectl.Service
             AnsiConsole.WriteLine("  --help, -h          Print help information.\n");
 
             AnsiConsole.WriteLine("Search options:");
-            AnsiConsole.WriteLine("  --filter, -f        Result filter. Possible options are discussions, faq, infobox, news, query, summarizer, videos, web, locations.");
+            AnsiConsole.WriteLine("  --filter, -f        Result filter. Possible options are videos, web.");
             AnsiConsole.WriteLine("  --query, -q         Search query (Max query length 400).");
             AnsiConsole.WriteLine("  --country, -c       (Optional: E.g US) Search query country, where the results come from.");
             AnsiConsole.WriteLine("  --lang, -l          (Optional: E.g en) Search language preference.");
@@ -168,12 +169,12 @@ namespace Bravectl.Service
             return Validator.TryValidateObject(queryParameters, new ValidationContext(queryParameters), validationResults, true);
         }
 
-        public async Task PrintSearchResult(QueryParameters queryParameters)
+        public async Task<BraveResponse> GetSearchResult(QueryParameters queryParameters)
         {
+            BraveResponse? braveResponse = new();
             try
             {
-                BraveResponse? searchResult = await _braveAPIService.GetRequest(queryParameters);
-                await PrintResult(searchResult);
+                braveResponse = await _braveAPIService.Search(queryParameters);
             }
             catch (JsonException exp)
             {
@@ -183,27 +184,50 @@ namespace Bravectl.Service
             {
                 AnsiConsole.MarkupLineInterpolated($"[red]Barve API error.[/] Error message: {exp.Message}");
             }
+            return braveResponse!;
         }
 
-        public static Task PrintResult(BraveResponse? braveResponse)
+        public static Task PrintSearchResult(BraveResponse? braveResponse, string filter = "web")
         {
-            if (braveResponse!.Web != null)
+            if (filter == "web" && braveResponse!.Web != null)
             {
-                var table = new Table()
+                var webTable = new Table()
                 {
                     Title = new TableTitle("Search result"),
                     ShowRowSeparators = true
                 };
-                table.AddColumns("[bold]Domain[/]", "[bold]Title[/]", "[bold]Short summary[/]", "[bold]URL[/]");
+                webTable.AddColumns("[bold]Domain[/]", "[bold]Title[/]", "[bold]Short summary[/]", "[bold]URL[/]");
                 foreach (SearchResult searchResult in braveResponse.Web.Results!)
                 {
-                    table.AddRow(
+                    webTable.AddRow(
                         searchResult!.Profile!.Long_name!,
                         EscapeHTMLtoString(searchResult!.Title!),
                         EscapeHTMLtoString(searchResult!.Description!),
                         searchResult!.Url!);
                 }
-                AnsiConsole.Write(table);
+                AnsiConsole.Write(webTable);
+            }
+            else if (filter == "videos" && braveResponse!.Videos != null)
+            {
+                var videosTable = new Table()
+                {
+                    Title = new TableTitle("Search result"),
+                    ShowRowSeparators = true
+                };
+                videosTable.AddColumns("[bold]Domain[/]", "[bold]Title[/]", "[bold]Short summary[/]", "[bold]URL[/]");
+                foreach (VideoResult videoResult in braveResponse.Videos.Results!)
+                {
+                    videosTable.AddRow(
+                        videoResult!.Meta_Url!.Hostname!,
+                        EscapeHTMLtoString(videoResult!.Title!),
+                        EscapeHTMLtoString(videoResult!.Description!),
+                        videoResult!.Url!);
+                }
+                AnsiConsole.Write(videosTable);
+            }
+            else
+            {
+                AnsiConsole.MarkupLine($"There are no result(s) for {braveResponse!.Query!.Original}.");
             }
             return Task.CompletedTask;
         }
