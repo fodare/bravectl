@@ -2,7 +2,8 @@
 
 A .NET tool that performs web searches using the Brave API. It functions by accepting command-line arguments and options, constructing a Brave API query parameter model, making an HTTP request to the Brave API, and displaying the search results in the console using spectre-console.
 
-![demo.png](demo.png)
+| ![demo.png](demo.png) | ![help message](helpMessage.png)|
+| ------- | --- |
 
 ## 🚀 Installation
 
