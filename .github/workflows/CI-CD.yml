@@ -37,7 +37,12 @@ jobs:
 
          - name: Build application
            run: dotnet build --no-restore
-           working-directory: .
+           working-directory: ./bravectl
+
+         - name: Build test project
+           run: dotnet build --no-restore
+           working-directory: ./bravectlTests
 
          - name: Run test(s)
            run: dotnet test --no-build --verbosity normal
+           working-directory: ./bravectlTests
