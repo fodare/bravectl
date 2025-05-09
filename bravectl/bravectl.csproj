@@ -9,11 +9,17 @@
     <ToolCommandName>bravectl</ToolCommandName>
     <PackageOutputPath>./nupkg</PackageOutputPath>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance> 
+    <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageId>bravectl</PackageId>
+    <Authors>open_ops</Authors>
+    <Company>open_ops</Company>
   </PropertyGroup>
 
   <ItemGroup>
     <Folder Include="Model/Command/" />
+    <None Include="../README.md" Pack="true" PackagePath=""/>
   </ItemGroup>
 
   <ItemGroup>
