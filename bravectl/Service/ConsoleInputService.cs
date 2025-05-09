@@ -31,10 +31,10 @@ namespace Bravectl.Service
         private ICollection<System.ComponentModel.DataAnnotations.ValidationResult>? _validationResults = null;
         private readonly IBraveAPIService _braveAPIService;
 
-        public ConsoleInputService(string[] cliArguments)
+        public ConsoleInputService(string[] cliArguments, IBraveAPIService braveAPIService)
         {
             _cliArguments = cliArguments;
-            _braveAPIService = new BraveAPIService();
+            _braveAPIService = braveAPIService;
         }
 
         public async Task Run()

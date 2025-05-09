@@ -5,7 +5,8 @@ namespace BraveCtl
     {
         static async Task Main(string[] arguments)
         {
-            ConsoleInputService inputService = new(arguments);
+            IBraveAPIService braveAPIService = new BraveAPIService();
+            ConsoleInputService inputService = new(arguments, braveAPIService);
             await inputService.Run();
         }
     }
