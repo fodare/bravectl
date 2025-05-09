@@ -23,8 +23,10 @@ jobs:
          - uses: actions/checkout@v4
 
          - name: Set version variable from tag
+           id: versionstep
            run: |
               echo "VERSION=$MAJORVERSION-$GITHUB_RUN_ID" >> $GITHUB_ENV
+              echo "versionnumber=$MAJORVERSION-$GITHUB_RUN_ID" >> $GITHUB_OUTPUT
 
          - name: Setup .Net
            uses: actions/setup-dotnet@v4
@@ -39,12 +41,12 @@ jobs:
            run: dotnet format .
            working-directory: .
 
-         - name: Build application
-           run: dotnet build --no-restore -p:Version=$VERSION
+         - name: Build console application
+           run: dotnet build --no-restore -p:PackageVersion=$VERSION -c Release --output ./artifacts bravectl/bravectl.csproj
            working-directory: bravectl
 
          - name: Build test project
-           run: dotnet build --no-restore
+           run: dotnet build --no-restore bravectlTests/bravectlTests.csproj
            working-directory: bravectlTests
 
          - name: Run test(s)
