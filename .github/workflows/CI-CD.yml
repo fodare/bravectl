@@ -37,11 +37,11 @@ jobs:
 
          - name: Build application
            run: dotnet build --no-restore
-           working-directory: ./bravectl
+           working-directory: bravectl
 
          - name: Build test project
            run: dotnet build --no-restore
-           working-directory: ./bravectlTests
+           working-directory: bravectlTests
 
          - name: Run test(s)
            run: dotnet test --no-build --verbosity normal
