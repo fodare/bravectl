@@ -50,3 +50,20 @@ jobs:
            with:
               name: artifacts-nuget
               path: ./artifacts/*.nupkg
+
+   publish:
+      runs-on: ubuntu-latest
+      needs: build
+
+      steps:
+         - uses: actions/checkout@v4
+
+         - name: Dowlaod artifacts
+           uses: actions/download-artifact@v4
+           with:
+              name: artifacts-nuget
+              path: /packages
+
+         - name: List artifacts
+           run: |
+              ls /packages
