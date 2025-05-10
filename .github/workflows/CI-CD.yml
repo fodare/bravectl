@@ -43,11 +43,9 @@ jobs:
 
          - name: Build console application
            run: dotnet build --no-restore -p:PackageVersion=$VERSION -c Release --output ./artifacts ./bravectl/bravectl.csproj
-           working-directory: bravectl
 
          - name: Build test project
            run: dotnet build --no-restore bravectlTests/bravectlTests.csproj
-           working-directory: bravectlTests
 
          - name: Run test(s)
            run: dotnet test --no-build --verbosity normal
