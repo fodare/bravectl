@@ -43,7 +43,7 @@ jobs:
               echo "versionnumber=$MAJORVERSION-${{github.run_number}}" >> $GITHUB_OUTPUT
 
          - name: Build console application
-           run: dotnet build --no-restore -p:PackageVersion=$VERSION -c Release --output ./artifacts ./bravectl/bravectl.csproj
+           run: dotnet build --no-restore -c Release --output ./artifacts ./bravectl/bravectl.csproj
 
          - name: Build test project
            run: dotnet build --no-restore bravectlTests/bravectlTests.csproj
