@@ -48,4 +48,4 @@ jobs:
            with:
               name: artifacts-nuget
               path: |
-                 bravectl/bravectl/artifacts/nupkg/*.nupkg
+                 ./bravectl/bravectl/artifacts/nupkg/*.nupkg
