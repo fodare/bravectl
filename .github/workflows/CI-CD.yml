@@ -39,8 +39,8 @@ jobs:
          - name: Set app-version
            run: |
               echo "Buid version is ${{github.run_number}}"
-              echo "VERSION=$MAJORVERSION-$github.run_number" >> $GITHUB_ENV
-              echo "versionnumber=$MAJORVERSION-$github.run_number" >> $GITHUB_OUTPUT
+              echo "VERSION=$MAJORVERSION-${{github.run_number}}" >> $GITHUB_ENV
+              echo "versionnumber=$MAJORVERSION-${{github.run_number}}" >> $GITHUB_OUTPUT
 
          - name: Build console application
            run: dotnet build --no-restore -p:PackageVersion=$VERSION -c Release --output ./artifacts ./bravectl/bravectl.csproj
