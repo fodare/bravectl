@@ -42,7 +42,7 @@ jobs:
               sed -i "s/\(<Version>\([0-9]\+\.\)\{2\}\)\([0-9]\+\)/\1${{github.run_number}}/" ${{env.project_file}}
 
          - name: Build console application
-           run: dotnet build --no-restore -p:PackageVersion=$VERSION -c Release --output ./artifacts bravectl/bravectl.csproj
+           run: dotnet build --no-restore -p:PackageVersion=$VERSION -c Release --output ./artifacts ./bravectl/bravectl.csproj
            working-directory: bravectl
 
          - name: Build test project
