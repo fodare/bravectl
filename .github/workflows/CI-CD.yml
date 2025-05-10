@@ -66,4 +66,4 @@ jobs:
 
          - name: List artifacts
            run: |
-              ${{ github.workspace }}/artifacts-nuget
+              ls ${{ github.workspace }}/artifacts-nuget
