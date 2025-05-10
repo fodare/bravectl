@@ -63,8 +63,7 @@ jobs:
            uses: actions/download-artifact@v4
            with:
               name: artifacts-nuget
-              path: /packages
 
          - name: List artifacts
            run: |
-              ls /packages
+              ls /artifacts-nuget
