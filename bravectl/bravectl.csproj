@@ -8,7 +8,7 @@
     <PackageVersion>1.0.1</PackageVersion>
     <PackAsTool>true</PackAsTool>
     <ToolCommandName>bravectl</ToolCommandName>
-    <PackageOutputPath>./nupkg</PackageOutputPath>
+    <PackageOutputPath>../nupkg</PackageOutputPath>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>

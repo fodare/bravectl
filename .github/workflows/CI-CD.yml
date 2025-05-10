@@ -35,7 +35,7 @@ jobs:
            working-directory: .
 
          - name: Build console application
-           run: dotnet build --no-restore -c Release --output . ./bravectl/bravectl.csproj
+           run: dotnet build --no-restore -c Release --output ./artifacts ./bravectl/bravectl.csproj
 
          - name: Build test project
            run: dotnet build --no-restore bravectlTests/bravectlTests.csproj
