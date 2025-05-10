@@ -66,4 +66,4 @@ jobs:
 
          - name: List artifacts
            run: |
-              ls /artifacts-nuget
+              ls artifacts-nuget
