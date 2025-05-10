@@ -71,7 +71,6 @@ jobs:
               ls artifacts-nuget
 
          - name: Publish to NuGet
-           needs: Dowlaod artifacts
            run: |
               dotnet nuget push artifacts-nuget/*.nupkg \
                 --api-key ${{ secrets.NUGET_KEY }} \
