@@ -1,4 +1,4 @@
-name: ci-cd-workflow
+name: build_publish_nugget
 
 on:
    push:
@@ -21,21 +21,19 @@ jobs:
       steps:
          - uses: actions/checkout@v4
 
-         - name: Setup .Net
+         - name: Setup .NET
            uses: actions/setup-dotnet@v4
            with:
               dotnet-version: 9.0.x
 
          - name: Restore dependencies
            run: dotnet restore
-           working-directory: .
 
          - name: Format code
            run: dotnet format .
-           working-directory: .
 
          - name: Build console application
-           run: dotnet build --no-restore -c Release --output ./artifacts ./bravectl/bravectl.csproj
+           run: dotnet build --no-restore -c Release ./bravectl/bravectl.csproj
 
          - name: Build test project
            run: dotnet build --no-restore bravectlTests/bravectlTests.csproj
@@ -44,8 +42,11 @@ jobs:
            run: dotnet test --no-build --verbosity normal
            working-directory: ./bravectlTests
 
-         - uses: actions/upload-artifact@v4
+         - name: Pack the project
+           run: dotnet pack -c Release --output ./artifacts ./bravectl/bravectl.csproj
+
+         - name: Upload NuGet package artifacts
+           uses: actions/upload-artifact@v4
            with:
               name: artifacts-nuget
-              path: |
-                 bravectl/bravectl/nupkg/*.nupkg
+              path: ./artifacts/*.nupkg
