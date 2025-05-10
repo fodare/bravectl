@@ -14,8 +14,6 @@ env:
    DOTNET_NOLOGO: true
    DOTNET_SKIP_FIRST_TIME_EXPERIENCE: true
    DOTNET_CLI_TELEMETRY_OPTOUT: true
-   dotnet_version: 9.0.x
-   project_file: bravectl/bravectl.csproj
 
 jobs:
    build:
@@ -36,12 +34,6 @@ jobs:
            run: dotnet format .
            working-directory: .
 
-         #  - name: Set app-version
-         #    run: |
-         #       echo "Buid version is ${{github.run_number}}"
-         #       echo "VERSION=$MAJORVERSION-${{github.run_number}}" >> $GITHUB_ENV
-         #       echo "versionnumber=$MAJORVERSION-${{github.run_number}}" >> $GITHUB_OUTPUT
-
          - name: Build console application
            run: dotnet build --no-restore -c Release --output ./artifacts ./bravectl/bravectl.csproj
 
@@ -51,3 +43,9 @@ jobs:
          - name: Run test(s)
            run: dotnet test --no-build --verbosity normal
            working-directory: ./bravectlTests
+
+         - uses: actions/upload-artifact@v4
+           with:
+              name: artifacts-nuget
+              path: |
+                 artifacts/*.nupkg
