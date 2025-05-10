@@ -51,7 +51,8 @@ You can build and use the tool locally or download executable version from [nuge
 ### Download from nuget.org
 
 ```bash
-# todo
+# See https://www.nuget.org/packages/bravectl
+dotnet tool install -g bravectl
 ```
 
 ## 🙌 Contributing
