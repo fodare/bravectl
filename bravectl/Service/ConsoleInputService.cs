@@ -230,7 +230,7 @@ namespace Bravectl.Service
             }
             else
             {
-                AnsiConsole.MarkupLine($"There are no result(s) for {braveResponse!.Query!.Original}.");
+                AnsiConsole.MarkupLine($"There are no result(s) for the searched query.");
             }
             return Task.CompletedTask;
         }
