@@ -5,7 +5,7 @@
     <TargetFramework>net9.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-    <PackageVersion>1.0.0</PackageVersion>
+    <PackageVersion>1.0.1</PackageVersion>
     <PackAsTool>true</PackAsTool>
     <ToolCommandName>bravectl</ToolCommandName>
     <PackageOutputPath>../nupkg</PackageOutputPath>
@@ -16,6 +16,7 @@
     <PackageId>bravectl</PackageId>
     <Authors>open_ops</Authors>
     <Company>open_ops</Company>
+    <RepositoryURL>https://github.com/fodare/bravectl</RepositoryURL>
   </PropertyGroup>
 
   <ItemGroup>
