@@ -52,7 +52,10 @@ namespace Bravectl.Service
                     if (IsQueryParameterValid(queryParameters, out _validationResults))
                     {
                         BraveResponse braveResponse = await GetSearchResult(queryParameters);
-                        await PrintSearchResult(braveResponse, queryParameters.ResultFilter!);
+                        if (braveResponse != null)
+                        {
+                            await PrintSearchResult(braveResponse, queryParameters.ResultFilter!);
+                        }
                     }
                     else
                     {
