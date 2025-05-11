@@ -1,6 +1,6 @@
-[![build_publish_nugget](https://github.com/fodare/bravectl/actions/workflows/CI-CD.yml/badge.svg)](https://github.com/fodare/bravectl/actions/workflows/CI-CD.yml)
-
 # bravectl
+
+[![build_publish_nugget](https://github.com/fodare/bravectl/actions/workflows/CI-CD.yml/badge.svg)](https://github.com/fodare/bravectl/actions/workflows/CI-CD.yml)
 
 A .NET tool that performs web searches using the Brave API. It functions by accepting command-line arguments and options, constructing a Brave API query parameter model, making an HTTP request to the Brave API, and displaying the search results in the console using spectre-console.
 
