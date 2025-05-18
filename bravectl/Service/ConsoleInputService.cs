@@ -72,14 +72,21 @@ namespace Bravectl.Service
                     }
                     else if (_cliArguments[0] == "extract")
                     {
-                        string? webPageContent = await StringfyWebPageContent(_cliArguments[1]);
-                        if (webPageContent is null || webPageContent == "")
+                        try
                         {
-                            AnsiConsole.MarkupLine($"[yellow]There are no content to extract from {_cliArguments[1]}.[/]");
+                            string? webPageContent = await StringfyWebPageContent(_cliArguments[1]);
+                            if (webPageContent is null || webPageContent == "")
+                            {
+                                AnsiConsole.MarkupLine($"[yellow]There are no content to extract from {_cliArguments[1]}.[/]");
+                            }
+                            else
+                            {
+                                await PrintPanneledPageContent(ConvertHtmlToText(webPageContent));
+                            }
                         }
-                        else
+                        catch (IndexOutOfRangeException)
                         {
-                            await PrintPanneledPageContent(ConvertHtmlToText(webPageContent));
+                            AnsiConsole.MarkupLine($"[red]Seems you are missing url to extract from.[/] See --help | -h for more info on usage.");
                         }
                     }
                 }
@@ -94,7 +101,7 @@ namespace Bravectl.Service
             }
         }
 
-        public static Task PrintHelp()
+        public Task PrintHelp()
         {
             AnsiConsole.WriteLine("Description: A lightweight C# command-line tool that interacts with the Brave API to facilitate web searches from your CLI.\n");
 
@@ -160,7 +167,7 @@ namespace Bravectl.Service
             });
         }
 
-        public static Task<QueryParameters> ConstructQueryParameters(Dictionary<string, string> parsedCmdArguments)
+        public Task<QueryParameters> ConstructQueryParameters(Dictionary<string, string> parsedCmdArguments)
         {
             return Task.Run(() =>
             {
@@ -183,7 +190,7 @@ namespace Bravectl.Service
             });
         }
 
-        public static string? GetParsedArgumentValue(Dictionary<string, string> parsedArguments, string firstKey, string secondKey)
+        public string? GetParsedArgumentValue(Dictionary<string, string> parsedArguments, string firstKey, string secondKey)
         {
             string value = "";
             if (parsedArguments.ContainsKey(firstKey))
@@ -197,7 +204,7 @@ namespace Bravectl.Service
             return value;
         }
 
-        public static bool IsQueryParameterValid(QueryParameters queryParameters, out ICollection<System.ComponentModel.DataAnnotations.ValidationResult> validationResults)
+        public bool IsQueryParameterValid(QueryParameters queryParameters, out ICollection<System.ComponentModel.DataAnnotations.ValidationResult> validationResults)
         {
             validationResults = [];
             return Validator.TryValidateObject(queryParameters, new ValidationContext(queryParameters), validationResults, true);
@@ -221,7 +228,7 @@ namespace Bravectl.Service
             return braveResponse!;
         }
 
-        public static Task PrintSearchResult(BraveResponse? braveResponse, string filter = "web")
+        public Task PrintSearchResult(BraveResponse? braveResponse, string filter = "web")
         {
             if (filter == "web" && braveResponse!.Web != null)
             {
@@ -266,12 +273,12 @@ namespace Bravectl.Service
             return Task.CompletedTask;
         }
 
-        public static string EscapeHTMLtoString(string htmlString)
+        public string EscapeHTMLtoString(string htmlString)
         {
             return HttpUtility.HtmlDecode(Markup.Escape(htmlString));
         }
 
-        public static async Task<string?> StringfyWebPageContent(string url)
+        public async Task<string?> StringfyWebPageContent(string url)
         {
             string webContnet = "";
             try
@@ -290,7 +297,7 @@ namespace Bravectl.Service
             return webContnet;
         }
 
-        public static string ConvertHtmlToText(string htmlContent)
+        public string ConvertHtmlToText(string htmlContent)
         {
             Regex[] _htmlReplaces = new[] {
                 new Regex(@"<script\b[^<]*(?:(?!</script>)<[^<]*)*</script>",
@@ -313,7 +320,7 @@ namespace Bravectl.Service
             return string.Join("\n", lines);
         }
 
-        public static Task PrintPanneledPageContent(string text)
+        public Task PrintPanneledPageContent(string text)
         {
             var panel = new Panel(text)
                 .Header("Page content")
