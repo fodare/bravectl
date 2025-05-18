@@ -1,5 +1,8 @@
 using System.ComponentModel.DataAnnotations;
+using System.Net;
+using System.Runtime.CompilerServices;
 using System.Text.Json;
+using System.Text.RegularExpressions;
 using System.Web;
 using Bravectl.Model.Response;
 using BraveCtl.Model;
@@ -27,7 +30,9 @@ namespace Bravectl.Service
             { "safe", "s" },
             { "max", "m"}
         };
-        private readonly string[] _cliArguments;
+
+        private readonly string[] knownSubCommands = ["search", "extract"];
+        private string[] _cliArguments;
         private ICollection<System.ComponentModel.DataAnnotations.ValidationResult>? _validationResults = null;
         private readonly IBraveAPIService _braveAPIService;
 
@@ -45,27 +50,47 @@ namespace Bravectl.Service
                 {
                     await PrintHelp();
                 }
-                else
+                else if (knownSubCommands.Contains(_cliArguments[0]))
                 {
-                    var parsedInput = await ParseCommandLineArguments();
-                    QueryParameters queryParameters = await ConstructQueryParameters(parsedInput);
-                    if (IsQueryParameterValid(queryParameters, out _validationResults))
+                    if (_cliArguments[0] == "search")
                     {
-                        BraveResponse braveResponse = await GetSearchResult(queryParameters);
-                        if (braveResponse != null)
+                        _cliArguments = [.. _cliArguments.Where(arguments => arguments != "search")];
+                        var parsedInput = await ParseCommandLineArguments();
+                        QueryParameters queryParameters = await ConstructQueryParameters(parsedInput);
+                        if (IsQueryParameterValid(queryParameters, out _validationResults))
                         {
-                            await PrintSearchResult(braveResponse, queryParameters.ResultFilter!);
+                            BraveResponse braveResponse = await GetSearchResult(queryParameters);
+                            if (braveResponse != null)
+                            {
+                                await PrintSearchResult(braveResponse, queryParameters.ResultFilter!);
+                            }
+                        }
+                        else
+                        {
+                            AnsiConsole.MarkupLine($"[red]{string.Join("\n", _validationResults.Select(result => result.ErrorMessage))}[/]");
                         }
                     }
-                    else
+                    else if (_cliArguments[0] == "extract")
                     {
-                        AnsiConsole.MarkupLine($"[red]{string.Join("\n", _validationResults.Select(result => result.ErrorMessage))}[/]");
+                        string? webPageContent = await StringfyWebPageContent(_cliArguments[1]);
+                        if (webPageContent is null || webPageContent == "")
+                        {
+                            AnsiConsole.MarkupLine($"[yellow]There are no content to extract from {_cliArguments[1]}.[/]");
+                        }
+                        else
+                        {
+                            await PrintPanneledPageContent(ConvertHtmlToText(webPageContent));
+                        }
                     }
+                }
+                else
+                {
+                    AnsiConsole.MarkupLine("[red]Invalid command / options. Please review option(s) / input(s) provided.[/] See -h | --help for more information on options.");
                 }
             }
             catch (ArgumentException)
             {
-                AnsiConsole.MarkupLine($"[red]Invalid option(s). Please review option(s) / input(s) provided.[/] See -h | --help for more information on options.");
+                AnsiConsole.MarkupLine($"[red]Invalid command / option(s). Please review option(s) / input(s) provided.[/] See -h | --help for more information on options.");
             }
         }
 
@@ -73,11 +98,17 @@ namespace Bravectl.Service
         {
             AnsiConsole.WriteLine("Description: A lightweight C# command-line tool that interacts with the Brave API to facilitate web searches from your CLI.\n");
 
-            AnsiConsole.WriteLine("Usage: barvectl [search-options]\n");
-
+            AnsiConsole.WriteLine("Usage: barvectl [sub-commands] [search-options]\n");
             AnsiConsole.WriteLine("  --help, -h          Print help information.\n");
 
-            AnsiConsole.WriteLine("Search options:");
+            AnsiConsole.WriteLine("  Example: barvectl search --filter web --query \"where is the ISS\" --max 5");
+            AnsiConsole.WriteLine("  Example: barvectl extract \"https://spotthestation.nasa.gov/\"");
+
+            AnsiConsole.WriteLine("\nSub commands:");
+            AnsiConsole.WriteLine("  search              Search the web for a given search query.");
+            AnsiConsole.WriteLine("  extract             Convert a given webpage(URL) to text and print to console.");
+
+            AnsiConsole.WriteLine("\nSearch options:");
             AnsiConsole.WriteLine("  --filter, -f        Result filter. Possible options are videos, web.");
             AnsiConsole.WriteLine("  --query, -q         Search query (Max query length 400).");
             AnsiConsole.WriteLine("  --country, -c       (Optional: E.g US) Search query country, where the results come from.");
@@ -238,6 +269,59 @@ namespace Bravectl.Service
         public static string EscapeHTMLtoString(string htmlString)
         {
             return HttpUtility.HtmlDecode(Markup.Escape(htmlString));
+        }
+
+        public static async Task<string?> StringfyWebPageContent(string url)
+        {
+            string webContnet = "";
+            try
+            {
+                using HttpClient httpClient = new();
+                webContnet = await httpClient.GetStringAsync(url);
+            }
+            catch (InvalidOperationException)
+            {
+                AnsiConsole.MarkupLine($"[red]Error. Provided url might be invalid, please check and try again.[/]");
+            }
+            catch (HttpRequestException exception)
+            {
+                AnsiConsole.MarkupLine($"[red]Error retriving content from {url}. Error message: {exception.Message}.[/]");
+            }
+            return webContnet;
+        }
+
+        public static string ConvertHtmlToText(string htmlContent)
+        {
+            Regex[] _htmlReplaces = new[] {
+                new Regex(@"<script\b[^<]*(?:(?!</script>)<[^<]*)*</script>",
+                RegexOptions.Compiled | RegexOptions.Singleline, TimeSpan.FromSeconds(1)),
+                new Regex(@"<style\b[^<]*(?:(?!</style>)<[^<]*)*</style>",
+                RegexOptions.Compiled | RegexOptions.Singleline, TimeSpan.FromSeconds(1)),
+                new Regex(@"<[^>]*>", RegexOptions.Compiled),
+                new Regex(@" +", RegexOptions.Compiled)
+            };
+
+            foreach (var r in _htmlReplaces)
+            {
+                htmlContent = r.Replace(htmlContent, " ");
+            }
+            var lines = htmlContent
+                .Split(new[] { '\r', '\n' })
+                .Select(_ => WebUtility.HtmlDecode(_.Trim()))
+                .Where(_ => _.Length > 0)
+                .ToArray();
+            return string.Join("\n", lines);
+        }
+
+        public static Task PrintPanneledPageContent(string text)
+        {
+            var panel = new Panel(text)
+                .Header("Page content")
+                .Border(BoxBorder.Rounded)
+                .Padding(1, 1, 1, 1)
+                .Expand();
+            AnsiConsole.Write(panel);
+            return Task.CompletedTask;
         }
     }
 }
