@@ -7,6 +7,12 @@ A .NET tool that performs web searches using the Brave API. It functions by acce
 | ![demo.png](https://github.com/fodare/media/blob/main/bravectl/demo.png?raw=true) | ![help message](https://github.com/fodare/media/blob/main/bravectl/helpMessage.png?raw=true)|
 | ------- | --- |
 
+## 🔧 Capabilities
+
+- 🌐 Search the web using Brave – Perform web searches with Brave Search and enjoy fewer ads and more privacy-focused results.
+
+- 📄 Extract and read web content – Convert a web page into plain text and display it directly in the console for easy reading.
+
 ## 🚀 Installation
 
 - Make sure you have [.NET 6+ SDK](https://dotnet.microsoft.com/download) installed.
@@ -34,8 +40,8 @@ You can build and use the tool locally or download executable version from [nuge
   export braveAPIKey=Enter-API-Key
 
   # (Optional) Run directly using alias from project dir.
-  dotnet run -- -f web -q "Where is the ISS"
-  # dotnet run -- --filter web --query "Where is the ISS"
+  dotnet run -- search -f web -q "Where is the ISS"
+  # dotnet run -- search --filter web --query "Where is the ISS"
 
   # Package tool locally. To overide tool name / command, see ToolCommandName in ...csproj file.
   # From project parent directory, run
@@ -45,7 +51,10 @@ You can build and use the tool locally or download executable version from [nuge
   dotnet tool install --global --add-source ./nupkg bravectl
 
   # Run application from any dir.
-  bravectl -f web -q "Where is the ISS"
+  bravectl search -f web -q "Where is the ISS"
+
+  # Convert webpage to text and print to console.
+  bravectl extract "https://www.astroviewer.net/iss/en/"
   ```
 
 ### Download from nuget.org
