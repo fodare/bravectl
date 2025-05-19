@@ -1,6 +1,5 @@
 using System.ComponentModel.DataAnnotations;
 using System.Net;
-using System.Runtime.CompilerServices;
 using System.Text.Json;
 using System.Text.RegularExpressions;
 using System.Web;
@@ -30,16 +29,17 @@ namespace Bravectl.Service
             { "safe", "s" },
             { "max", "m"}
         };
-
         private readonly string[] knownSubCommands = ["search", "extract"];
         private string[] _cliArguments;
         private ICollection<System.ComponentModel.DataAnnotations.ValidationResult>? _validationResults = null;
         private readonly IBraveAPIService _braveAPIService;
+        private readonly IAnsiConsole _console;
 
-        public ConsoleInputService(string[] cliArguments, IBraveAPIService braveAPIService)
+        public ConsoleInputService(string[] cliArguments, IBraveAPIService braveAPIService, IAnsiConsole console)
         {
             _cliArguments = cliArguments;
             _braveAPIService = braveAPIService;
+            _console = console;
         }
 
         public async Task Run()
@@ -67,7 +67,7 @@ namespace Bravectl.Service
                         }
                         else
                         {
-                            AnsiConsole.MarkupLine($"[red]{string.Join("\n", _validationResults.Select(result => result.ErrorMessage))}[/]");
+                            _console.MarkupLine($"[red]{string.Join("\n", _validationResults.Select(result => result.ErrorMessage))}[/]");
                         }
                     }
                     else if (_cliArguments[0] == "extract")
@@ -77,7 +77,7 @@ namespace Bravectl.Service
                             string? webPageContent = await StringfyWebPageContent(_cliArguments[1]);
                             if (webPageContent is null || webPageContent == "")
                             {
-                                AnsiConsole.MarkupLine($"[yellow]There are no content to extract from {_cliArguments[1]}.[/]");
+                                _console.MarkupLine($"[yellow]There are no content to extract from {_cliArguments[1]}.[/]");
                             }
                             else
                             {
@@ -86,43 +86,43 @@ namespace Bravectl.Service
                         }
                         catch (IndexOutOfRangeException)
                         {
-                            AnsiConsole.MarkupLine($"[red]Seems you are missing url to extract from.[/] See --help | -h for more info on usage.");
+                            _console.MarkupLine($"[red]Seems you are missing url to extract from.[/] See --help | -h for more info on usage.");
                         }
                     }
                 }
                 else
                 {
-                    AnsiConsole.MarkupLine("[red]Invalid command / options. Please review option(s) / input(s) provided.[/] See -h | --help for more information on options.");
+                    _console.MarkupLine("[red]Invalid command / options. Please review option(s) / input(s) provided.[/] See -h | --help for more information on options.");
                 }
             }
             catch (ArgumentException)
             {
-                AnsiConsole.MarkupLine($"[red]Invalid command / option(s). Please review option(s) / input(s) provided.[/] See -h | --help for more information on options.");
+                _console.MarkupLine($"[red]Invalid command / option(s). Please review option(s) / input(s) provided.[/] See -h | --help for more information on options.");
             }
         }
 
         public Task PrintHelp()
         {
-            AnsiConsole.WriteLine("Description: A lightweight C# command-line tool that interacts with the Brave API to facilitate web searches from your CLI.\n");
+            _console.MarkupLine("Description: A lightweight C# command-line tool that interacts with the Brave API to facilitate web searches from your CLI.\n");
 
-            AnsiConsole.WriteLine("Usage: barvectl [sub-commands] [search-options]\n");
-            AnsiConsole.WriteLine("  --help, -h          Print help information.\n");
+            _console.MarkupLine("Usage: barvectl [sub-commands] [search-options]\n".EscapeMarkup());
+            _console.MarkupLine("  --help, -h          Print help information.\n");
 
-            AnsiConsole.WriteLine("  Example: barvectl search --filter web --query \"where is the ISS\" --max 5");
-            AnsiConsole.WriteLine("  Example: barvectl extract \"https://spotthestation.nasa.gov/\"");
+            _console.MarkupLine("  Example: barvectl search --filter web --query \"where is the ISS\" --max 5");
+            _console.MarkupLine("  Example: barvectl extract \"https://spotthestation.nasa.gov/\"");
 
-            AnsiConsole.WriteLine("\nSub commands:");
-            AnsiConsole.WriteLine("  search              Search the web for a given search query.");
-            AnsiConsole.WriteLine("  extract             Convert a given webpage(URL) to text and print to console.");
+            _console.MarkupLine("\nSub commands:");
+            _console.MarkupLine("  search              Search the web for a given search query.");
+            _console.MarkupLine("  extract             Convert a given webpage(URL) to text and print to console.");
 
-            AnsiConsole.WriteLine("\nSearch options:");
-            AnsiConsole.WriteLine("  --filter, -f        Result filter. Possible options are videos, web.");
-            AnsiConsole.WriteLine("  --query, -q         Search query (Max query length 400).");
-            AnsiConsole.WriteLine("  --country, -c       (Optional: E.g US) Search query country, where the results come from.");
-            AnsiConsole.WriteLine("  --lang, -l          (Optional: E.g en) Search language preference.");
-            AnsiConsole.WriteLine("  --interface, -i     (Optional: E.g en-US) User interface language perferred in response.");
-            AnsiConsole.WriteLine("  --safe, -s          (Optional: E.g off) Filter search results for adult content. Possible options are off, moderate, strict.");
-            AnsiConsole.WriteLine("  --max, -m           (Optional: E.g 10) Number of returned result. Default count is 5 and max is 20");
+            _console.MarkupLine("\nSearch options:");
+            _console.MarkupLine("  --filter, -f        Result filter. Possible options are videos, web.");
+            _console.MarkupLine("  --query, -q         Search query (Max query length 400).");
+            _console.MarkupLine("  --country, -c       (Optional: E.g US) Search query country, where the results come from.");
+            _console.MarkupLine("  --lang, -l          (Optional: E.g en) Search language preference.");
+            _console.MarkupLine("  --interface, -i     (Optional: E.g en-US) User interface language perferred in response.");
+            _console.MarkupLine("  --safe, -s          (Optional: E.g off) Filter search results for adult content. Possible options are off, moderate, strict.");
+            _console.MarkupLine("  --max, -m           (Optional: E.g 10) Number of returned result. Default count is 5 and max is 20");
             return Task.CompletedTask;
         }
 
@@ -219,11 +219,11 @@ namespace Bravectl.Service
             }
             catch (JsonException exp)
             {
-                AnsiConsole.MarkupLineInterpolated($"[red]Error parsing brave response.[/] Error message: {exp.Message}");
+                _console.MarkupLineInterpolated($"[red]Error parsing brave response.[/] Error message: {exp.Message}");
             }
             catch (HttpRequestException exp)
             {
-                AnsiConsole.MarkupLineInterpolated($"[red]Barve API error.[/] Error message: {exp.Message}");
+                _console.MarkupLine($"[red]Barve API error.[/] Error message: {exp.Message}");
             }
             return braveResponse!;
         }
@@ -268,7 +268,7 @@ namespace Bravectl.Service
             }
             else
             {
-                AnsiConsole.MarkupLine($"There are no result(s) for the searched query.");
+                _console.MarkupLine($"There are no result(s) for the searched query.");
             }
             return Task.CompletedTask;
         }
@@ -288,11 +288,11 @@ namespace Bravectl.Service
             }
             catch (InvalidOperationException)
             {
-                AnsiConsole.MarkupLine($"[red]Error. Provided url might be invalid, please check and try again.[/]");
+                _console.MarkupLine($"[red]Error. Provided url might be invalid, please check and try again.[/]");
             }
             catch (HttpRequestException exception)
             {
-                AnsiConsole.MarkupLine($"[red]Error retriving content from {url}. Error message: {exception.Message}.[/]");
+                _console.MarkupLine($"[red]Error retriving content from {url}. Error message: {exception.Message}.[/]");
             }
             return webContnet;
         }
