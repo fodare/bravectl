@@ -322,7 +322,7 @@ namespace Bravectl.Service
 
         public Task PrintPanneledPageContent(string text)
         {
-            var panel = new Panel(text)
+            var panel = new Panel(text.EscapeMarkup())
                 .Header("Page content")
                 .Border(BoxBorder.Rounded)
                 .Padding(1, 1, 1, 1)
